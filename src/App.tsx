@@ -9,6 +9,7 @@ import PromptBuilder from "./pages/PromptBuilder";
 import Templates from "./pages/Templates";
 import Examples from "./pages/Examples";
 import About from "./pages/About";
+import FeedbackReview from "./pages/FeedbackReview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/templates" element={<Templates />} />
           <Route path="/examples" element={<Examples />} />
           <Route path="/about" element={<About />} />
+          <Route path="/feedback-review" element={<FeedbackReview />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

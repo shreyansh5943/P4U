@@ -8,6 +8,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [formData, setFormData] = useState({
@@ -16,16 +17,49 @@ const Index = () => {
     type: "review",
     message: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    toast({
-      title: "Thank you for your feedback!",
-      description: "We'll review your submission and get back to you if needed.",
-    });
-    setFormData({ name: "", email: "", type: "review", message: "" });
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            type: formData.type,
+            message: formData.message
+          }
+        ]);
+
+      if (error) {
+        console.error('Error submitting feedback:', error);
+        toast({
+          title: "Error",
+          description: "Failed to submit feedback. Please try again.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Thank you for your feedback!",
+          description: "We'll review your submission and get back to you if needed.",
+        });
+        setFormData({ name: "", email: "", type: "review", message: "" });
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit feedback. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -227,9 +261,10 @@ const Index = () => {
                 
                 <Button 
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3"
                 >
-                  Submit Feedback
+                  {isSubmitting ? "Submitting..." : "Submit Feedback"}
                 </Button>
               </form>
             </CardContent>
