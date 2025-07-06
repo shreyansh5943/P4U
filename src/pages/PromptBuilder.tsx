@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import PromptImprover from "@/components/PromptImprover";
 import { useToast } from "@/hooks/use-toast";
 
 interface FormData {
@@ -109,6 +109,10 @@ Please ensure the website is professional, user-friendly, and optimized for the 
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handleReplaceOriginal = (improvedPrompt: string) => {
+    setGeneratedPrompt(improvedPrompt);
   };
 
   const renderStep = () => {
@@ -291,7 +295,7 @@ Please ensure the website is professional, user-friendly, and optimized for the 
           </div>
 
           {/* Preview Section */}
-          <div>
+          <div className="space-y-6">
             <Card className="shadow-lg h-fit">
               <CardHeader>
                 <CardTitle className="text-2xl">Your AI Prompt Preview</CardTitle>
@@ -317,6 +321,12 @@ Please ensure the website is professional, user-friendly, and optimized for the 
                 )}
               </CardContent>
             </Card>
+
+            {/* AI Prompt Improver */}
+            <PromptImprover 
+              originalPrompt={generatedPrompt} 
+              onReplaceOriginal={handleReplaceOriginal}
+            />
           </div>
         </div>
       </div>
