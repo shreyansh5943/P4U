@@ -5,9 +5,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PromptImprover from "@/components/PromptImprover";
+import BusinessIdeaAnalyzer from "@/components/BusinessIdeaAnalyzer";
+import PromptPreview from "@/components/PromptPreview";
+import GuidedQAWizard from "@/components/GuidedQAWizard";
 import { useToast } from "@/hooks/use-toast";
 
 interface FormData {
@@ -20,7 +24,15 @@ interface FormData {
   additionalInfo: string;
 }
 
+interface BusinessSuggestions {
+  suggestedPages: string[];
+  suggestedFeatures: string[];
+  suggestedDesignStyle: string;
+  explanation: string;
+}
+
 const PromptBuilder = () => {
+  const [activeTab, setActiveTab] = useState("form");
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     websiteName: "",
@@ -32,6 +44,7 @@ const PromptBuilder = () => {
     additionalInfo: ""
   });
   const [generatedPrompt, setGeneratedPrompt] = useState("");
+  const [guidedPrompt, setGuidedPrompt] = useState("");
   const { toast } = useToast();
 
   const totalSteps = 6;
@@ -89,8 +102,8 @@ Please ensure the website is professional, user-friendly, and optimized for the 
     setGeneratedPrompt(prompt);
   };
 
-  const copyPrompt = () => {
-    navigator.clipboard.writeText(generatedPrompt);
+  const copyPrompt = (prompt: string) => {
+    navigator.clipboard.writeText(prompt);
     toast({
       title: "Prompt Copied!",
       description: "Your AI prompt has been copied to clipboard.",
@@ -112,7 +125,25 @@ Please ensure the website is professional, user-friendly, and optimized for the 
   };
 
   const handleReplaceOriginal = (improvedPrompt: string) => {
-    setGeneratedPrompt(improvedPrompt);
+    if (activeTab === "form") {
+      setGeneratedPrompt(improvedPrompt);
+    } else {
+      setGuidedPrompt(improvedPrompt);
+    }
+  };
+
+  const handleUseSuggestions = (suggestions: BusinessSuggestions) => {
+    setFormData(prev => ({
+      ...prev,
+      pages: suggestions.suggestedPages,
+      features: suggestions.suggestedFeatures,
+      designStyle: suggestions.suggestedDesignStyle
+    }));
+    setActiveTab("form");
+  };
+
+  const handleGuidedPromptGenerated = (prompt: string) => {
+    setGuidedPrompt(prompt);
   };
 
   const renderStep = () => {
@@ -239,6 +270,8 @@ Please ensure the website is professional, user-friendly, and optimized for the 
     }
   };
 
+  const currentPrompt = activeTab === "form" ? generatedPrompt : guidedPrompt;
+
   return (
     <div className="min-h-screen bg-gray-50 font-inter">
       <Navigation />
@@ -247,88 +280,106 @@ Please ensure the website is professional, user-friendly, and optimized for the 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">AI Prompt Builder</h1>
           <p className="text-xl text-gray-600">
-            Answer a few questions to generate the perfect prompt for your AI website builder
+            Choose your preferred method to create the perfect prompt for your AI website builder
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Form Section */}
-          <div>
-            <Card className="shadow-lg">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-2xl">
-                    Step {currentStep} of {totalSteps}
-                  </CardTitle>
-                  <div className="text-sm text-gray-500">
-                    {Math.round((currentStep / totalSteps) * 100)}% Complete
-                  </div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-                  ></div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {renderStep()}
-                
-                <div className="flex justify-between pt-6">
-                  <Button
-                    variant="outline"
-                    onClick={prevStep}
-                    disabled={currentStep === 1}
-                    className="px-8"
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    onClick={nextStep}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8"
-                  >
-                    {currentStep === totalSteps ? "Generate Prompt" : "Next"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        <BusinessIdeaAnalyzer onUseSuggestions={handleUseSuggestions} />
 
-          {/* Preview Section */}
-          <div className="space-y-6">
-            <Card className="shadow-lg h-fit">
-              <CardHeader>
-                <CardTitle className="text-2xl">Your AI Prompt Preview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {generatedPrompt ? (
-                  <div className="space-y-4">
-                    <div className="bg-gray-100 rounded-lg p-4 font-mono text-sm leading-relaxed max-h-96 overflow-y-auto">
-                      {generatedPrompt}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="form">Step-by-Step Form</TabsTrigger>
+            <TabsTrigger value="guided">Guided Q&A</TabsTrigger>
+          </TabsList>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div>
+              <TabsContent value="form">
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-2xl">
+                        Step {currentStep} of {totalSteps}
+                      </CardTitle>
+                      <div className="text-sm text-gray-500">
+                        {Math.round((currentStep / totalSteps) * 100)}% Complete
+                      </div>
                     </div>
-                    <Button
-                      onClick={copyPrompt}
-                      className="w-full bg-green-500 hover:bg-green-600 text-white"
-                    >
-                      Copy Prompt to Clipboard
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-gray-500">
-                    <div className="text-6xl mb-4">📝</div>
-                    <p>Complete the form to see your generated prompt here</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                      ></div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {renderStep()}
+                    
+                    <div className="flex justify-between pt-6">
+                      <Button
+                        variant="outline"
+                        onClick={prevStep}
+                        disabled={currentStep === 1}
+                        className="px-8"
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        onClick={nextStep}
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8"
+                      >
+                        {currentStep === totalSteps ? "Generate Prompt" : "Next"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-            {/* AI Prompt Improver */}
-            <PromptImprover 
-              originalPrompt={generatedPrompt} 
-              onReplaceOriginal={handleReplaceOriginal}
-            />
+              <TabsContent value="guided">
+                <GuidedQAWizard onPromptGenerated={handleGuidedPromptGenerated} />
+              </TabsContent>
+            </div>
+
+            {/* Preview Section */}
+            <div className="space-y-6">
+              <Card className="shadow-lg h-fit">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Your AI Prompt Preview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {currentPrompt ? (
+                    <div className="space-y-4">
+                      <div className="bg-gray-100 rounded-lg p-4 font-mono text-sm leading-relaxed max-h-96 overflow-y-auto">
+                        {currentPrompt}
+                      </div>
+                      <Button
+                        onClick={() => copyPrompt(currentPrompt)}
+                        className="w-full bg-green-500 hover:bg-green-600 text-white"
+                      >
+                        Copy Prompt to Clipboard
+                      </Button>
+                      <PromptPreview 
+                        prompt={currentPrompt} 
+                        websitePurpose={formData.purpose || "your website"}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <div className="text-6xl mb-4">📝</div>
+                      <p>Complete the form or guided Q&A to see your generated prompt here</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* AI Prompt Improver */}
+              <PromptImprover 
+                originalPrompt={currentPrompt} 
+                onReplaceOriginal={handleReplaceOriginal}
+              />
+            </div>
           </div>
-        </div>
+        </Tabs>
       </div>
       
       <Footer />

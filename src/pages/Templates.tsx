@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import PromptPreview from "@/components/PromptPreview";
 import { useToast } from "@/hooks/use-toast";
+import { Eye, Copy, Edit, Star } from "lucide-react";
 
 interface Template {
   id: string;
@@ -15,6 +18,9 @@ interface Template {
   category: string;
   prompt: string;
   features: string[];
+  useCase: string;
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
+  estimatedTime: string;
 }
 
 const Templates = () => {
@@ -26,9 +32,12 @@ const Templates = () => {
   const templates: Template[] = [
     {
       id: "portfolio",
-      title: "Portfolio Website",
-      description: "Perfect for designers, developers, and creatives",
+      title: "Creative Portfolio",
+      description: "Perfect for designers, developers, and creatives to showcase their work",
       category: "Personal",
+      useCase: "Showcase work and attract clients",
+      difficulty: "Beginner",
+      estimatedTime: "2-3 hours",
       features: ["Hero Section", "Project Gallery", "About Me", "Contact Form", "Skills Showcase"],
       prompt: `Create a modern portfolio website for a creative professional. Include:
 
@@ -51,67 +60,43 @@ Additional features:
 - Clear call-to-action buttons`
     },
     {
-      id: "restaurant",
-      title: "Restaurant Landing Page",
-      description: "Showcase your restaurant with style and flavor",
+      id: "local-business",
+      title: "Local Business",
+      description: "Perfect for restaurants, salons, shops, and service providers",
       category: "Business",
-      features: ["Menu Display", "Reservation System", "Location Map", "Photo Gallery", "Reviews"],
-      prompt: `Create an appetizing restaurant landing page that includes:
+      useCase: "Attract local customers and bookings",
+      difficulty: "Beginner",
+      estimatedTime: "1-2 hours",
+      features: ["Location Map", "Hours & Contact", "Services", "Reviews", "Booking System"],
+      prompt: `Create a local business website that includes:
 
-- Hero section with mouth-watering food photography
-- About the restaurant story and chef background
-- Menu sections with prices and descriptions
-- Image gallery showcasing dishes and atmosphere
-- Reservation booking system
-- Location with embedded map and hours
+- Hero section with business name, tagline, and main service
+- About section with business story and team
+- Services or menu section with prices and descriptions
+- Location with embedded map and business hours
 - Customer reviews and testimonials
-- Contact information and social media
+- Contact information and booking system
+- Photo gallery showcasing work/products
 
-Design Style: Warm and inviting with food-focused imagery
-Color Scheme: Rich colors that complement food photography
-Typography: Elegant and readable fonts
-Layout: Visual hierarchy emphasizing food and experience
+Design Style: Trustworthy and professional
+Color Scheme: Reflects business personality
+Layout: Easy navigation for local customers
+Features: Mobile-friendly for on-the-go users
 
-Special features:
-- Online reservation integration
-- Menu filtering by category
-- Photo gallery with lightbox effect
-- Mobile-friendly design for on-the-go customers`
-    },
-    {
-      id: "startup",
-      title: "Tech Startup",
-      description: "Launch your startup with a professional presence",
-      category: "Business",
-      features: ["Product Demo", "Team Section", "Pricing Plans", "Blog", "Newsletter"],
-      prompt: `Create a professional tech startup website featuring:
-
-- Compelling hero section explaining the product/service
-- Problem-solution narrative with clear value proposition
-- Product features with screenshots or demo videos
-- Pricing plans with comparison table
-- Team section with founders and key members
-- Customer testimonials and success stories
-- Blog section for content marketing
-- Newsletter signup with lead magnet
-- Contact and demo request forms
-
-Design Style: Modern, tech-focused, and trustworthy
-Color Scheme: Professional blues and grays with bright accent
-Layout: Clean sections with clear information hierarchy
-Features: Interactive elements and smooth animations
-
-Technical elements:
-- Fast loading and optimized performance
-- SEO-friendly structure
-- Analytics integration ready
+Special elements:
+- Local SEO optimization
+- Click-to-call buttons
+- Directions integration
 - Social proof and trust indicators`
     },
     {
-      id: "ecommerce",
-      title: "Online Store",
-      description: "Start selling online with a complete store setup",
+      id: "online-store",
+      title: "E-commerce Store",
+      description: "Complete online store setup for selling products",
       category: "E-commerce",
+      useCase: "Sell products online with secure checkout",
+      difficulty: "Advanced",
+      estimatedTime: "4-6 hours",
       features: ["Product Catalog", "Shopping Cart", "Checkout", "User Accounts", "Payment Integration"],
       prompt: `Create a complete e-commerce website with:
 
@@ -141,10 +126,77 @@ E-commerce specific:
 - Customer support integration`
     },
     {
-      id: "blog",
+      id: "saas-landing",
+      title: "SaaS Landing Page",
+      description: "Convert visitors into customers for your software product",
+      category: "Business",
+      useCase: "Drive signups and subscriptions",
+      difficulty: "Intermediate",
+      estimatedTime: "2-4 hours",
+      features: ["Product Demo", "Pricing Plans", "Feature Highlights", "Social Proof", "CTA Forms"],
+      prompt: `Create a high-converting SaaS landing page featuring:
+
+- Compelling hero section with clear value proposition
+- Problem-solution narrative
+- Product features with screenshots or demo videos
+- Pricing plans with comparison table
+- Customer testimonials and success stories
+- Free trial or demo signup forms
+- FAQ section addressing common concerns
+- Social proof (customer logos, user count)
+
+Design Elements:
+- Modern, tech-focused design
+- Trust indicators and security badges
+- Mobile-responsive layout
+- Fast loading and optimized performance
+
+Conversion Optimization:
+- Multiple call-to-action buttons
+- Lead capture forms
+- Social proof throughout
+- Clear benefit statements
+- Risk-free trial messaging`
+    },
+    {
+      id: "event-page",
+      title: "Event Landing Page",
+      description: "Promote events and manage registrations effectively",
+      category: "Events",
+      useCase: "Drive event registration and attendance",
+      difficulty: "Beginner",
+      estimatedTime: "1-2 hours",
+      features: ["Event Details", "Registration Form", "Schedule", "Speaker Profiles", "Location Map"],
+      prompt: `Create an engaging event landing page with:
+
+- Eye-catching hero section with event name and date
+- Event overview and key benefits
+- Detailed schedule and agenda
+- Speaker or performer profiles
+- Registration form with ticket options
+- Venue information with map and directions
+- FAQ section for common questions
+- Social media integration for sharing
+
+Design Style: Energetic and engaging
+Layout: Single-page with smooth scrolling
+Features: Mobile-friendly registration
+
+Event-specific elements:
+- Countdown timer to event date
+- Early bird pricing options
+- Social proof (past attendee testimonials)
+- Clear registration call-to-action
+- Contact information for questions`
+    },
+    {
+      id: "blog-personal",
       title: "Personal Blog",
-      description: "Share your thoughts and stories with the world",
+      description: "Share your thoughts, stories, and expertise with readers",
       category: "Personal",
+      useCase: "Build audience and share knowledge",
+      difficulty: "Beginner",
+      estimatedTime: "2-3 hours",
       features: ["Blog Posts", "Categories", "Search", "Comments", "Author Bio"],
       prompt: `Create a personal blog website that includes:
 
@@ -172,37 +224,6 @@ Blog Features:
 - Reading time estimates
 - Mobile-optimized reading experience
 - SEO optimization for better discoverability`
-    },
-    {
-      id: "agency",
-      title: "Creative Agency",
-      description: "Showcase your agency's work and attract clients",
-      category: "Business",
-      features: ["Service Pages", "Case Studies", "Team Profiles", "Client Logos", "Contact Forms"],
-      prompt: `Create a professional creative agency website featuring:
-
-- Striking hero section showcasing your best work
-- Services pages detailing what you offer
-- Portfolio with detailed case studies
-- Team page with member profiles and expertise
-- Client testimonials and logo showcase
-- About page with agency story and values
-- Blog for sharing insights and updates
-- Contact page with multiple ways to reach you
-- Career page for potential hires
-
-Design Approach:
-- Bold, creative design that reflects your style
-- Portfolio-first layout with visual emphasis
-- Professional color palette with creative touches
-- High-quality imagery and graphics
-
-Agency-Specific Features:
-- Project case studies with before/after
-- Client logo carousel
-- Service-specific landing pages
-- Team member individual profiles
-- Client portal access (optional)`
     }
   ];
 
@@ -228,16 +249,25 @@ Agency-Specific Features:
     ? templates 
     : templates.filter(t => t.category === selectedCategory);
 
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "Beginner": return "bg-green-100 text-green-800";
+      case "Intermediate": return "bg-yellow-100 text-yellow-800";
+      case "Advanced": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white font-inter">
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Prompt Templates</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Website Templates</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Get started quickly with our professionally crafted prompt templates. 
-            Click any template to customize it for your needs.
+            Each template includes detailed examples and customization options.
           </p>
         </div>
 
@@ -263,46 +293,68 @@ Agency-Specific Features:
           {filteredTemplates.map((template) => (
             <Card 
               key={template.id} 
-              className="hover:shadow-lg transition-shadow cursor-pointer group"
+              className="hover:shadow-lg transition-all duration-300 cursor-pointer group border-l-4 border-l-transparent hover:border-l-blue-500"
               onClick={() => openTemplate(template)}
             >
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex justify-between items-start mb-2">
-                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-xl group-hover:text-blue-600 transition-colors line-clamp-2">
                     {template.title}
                   </CardTitle>
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                    {template.category}
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                    <span className="text-sm text-gray-500">New</span>
+                  </div>
                 </div>
-                <p className="text-gray-600">{template.description}</p>
+                <p className="text-gray-600 text-sm line-clamp-2">{template.description}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {template.category}
+                  </Badge>
+                  <Badge className={`text-xs ${getDifficultyColor(template.difficulty)}`}>
+                    {template.difficulty}
+                  </Badge>
+                </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="space-y-3">
                   <div>
-                    <h4 className="font-semibold text-sm text-gray-900 mb-1">Includes:</h4>
+                    <p className="text-sm text-gray-500 mb-1">
+                      <strong>Use Case:</strong> {template.useCase}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <strong>Est. Time:</strong> {template.estimatedTime}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-sm text-gray-900 mb-1">Key Features:</h4>
                     <div className="flex flex-wrap gap-1">
                       {template.features.slice(0, 3).map((feature) => (
                         <span 
                           key={feature}
-                          className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+                          className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border"
                         >
                           {feature}
                         </span>
                       ))}
                       {template.features.length > 3 && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 px-2 py-1">
                           +{template.features.length - 3} more
                         </span>
                       )}
                     </div>
                   </div>
-                  <Button 
-                    className="w-full group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 group-hover:text-white transition-all"
-                    variant="outline"
-                  >
-                    Use This Template
-                  </Button>
+                  
+                  <div className="flex gap-2 pt-2">
+                    <Button 
+                      className="flex-1 group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 group-hover:text-white transition-all text-sm py-2 flex items-center gap-2"
+                      variant="outline"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Preview & Use
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -312,52 +364,80 @@ Agency-Specific Features:
 
       {/* Template Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl">
-              {selectedTemplate?.title} Template
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              {selectedTemplate?.title}
+              <Badge className={`text-xs ${selectedTemplate ? getDifficultyColor(selectedTemplate.difficulty) : ''}`}>
+                {selectedTemplate?.difficulty}
+              </Badge>
             </DialogTitle>
+            <p className="text-gray-600">{selectedTemplate?.description}</p>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Features Included:</h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedTemplate?.features.map((feature) => (
-                  <span 
-                    key={feature}
-                    className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full"
-                  >
-                    {feature}
-                  </span>
-                ))}
+          
+          {selectedTemplate && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="font-semibold mb-2">Template Details:</h3>
+                  <div className="space-y-2 text-sm">
+                    <p><strong>Category:</strong> {selectedTemplate.category}</p>
+                    <p><strong>Use Case:</strong> {selectedTemplate.useCase}</p>
+                    <p><strong>Estimated Time:</strong> {selectedTemplate.estimatedTime}</p>
+                    <p><strong>Difficulty:</strong> {selectedTemplate.difficulty}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-2">Included Features:</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTemplate.features.map((feature) => (
+                      <span 
+                        key={feature}
+                        className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full"
+                      >
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Edit className="w-4 h-4" />
+                  Customize Your Prompt:
+                </h3>
+                <Textarea
+                  value={editedPrompt}
+                  onChange={(e) => setEditedPrompt(e.target.value)}
+                  className="min-h-[300px] font-mono text-sm"
+                  placeholder="Your prompt will appear here..."
+                />
+              </div>
+
+              <PromptPreview 
+                prompt={editedPrompt} 
+                websitePurpose={selectedTemplate.useCase}
+              />
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={copyPrompt}
+                  className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white flex items-center gap-2"
+                >
+                  <Copy className="w-4 h-4" />
+                  Copy Customized Prompt
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Close
+                </Button>
               </div>
             </div>
-            
-            <div>
-              <h3 className="font-semibold mb-2">Customize Your Prompt:</h3>
-              <Textarea
-                value={editedPrompt}
-                onChange={(e) => setEditedPrompt(e.target.value)}
-                className="min-h-[300px] font-mono text-sm"
-                placeholder="Your prompt will appear here..."
-              />
-            </div>
-            
-            <div className="flex gap-3">
-              <Button
-                onClick={copyPrompt}
-                className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
-              >
-                Copy Customized Prompt
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-              >
-                Close
-              </Button>
-            </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
       
