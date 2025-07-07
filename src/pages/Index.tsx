@@ -8,26 +8,94 @@ const Index = () => {
     <div className="min-h-screen bg-white font-inter">
       <Navigation />
       
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Revolutionize Your Website Creation with AI
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Generate stunning website layouts and content effortlessly using our AI-powered prompt builder.
-          </p>
-          <div className="flex justify-center space-x-4">
-            <Link to="/prompt-builder">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-lg font-medium px-8 py-3 rounded-md">
-                Start Building Now
-              </Button>
-            </Link>
-            <Link to="/examples">
-              <Button variant="outline" className="text-lg font-medium px-8 py-3 rounded-md">
-                Explore Examples
-              </Button>
-            </Link>
+      {/* Enhanced Hero Section */}
+      <section className="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-center lg:text-left">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                Turn Your Website Idea Into Reality —{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+                  No Code, Just Smart Prompts
+                </span>
+              </h1>
+              
+              <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                PromptBuddy helps you generate the perfect AI prompt to build your dream website in tools like Framer, Webflow, and more.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link to="/prompt-builder">
+                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-lg font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    🪄 Start Building Your Prompt
+                  </Button>
+                </Link>
+                
+                <Link 
+                  to="/prompt-builder" 
+                  className="text-purple-600 hover:text-purple-700 font-medium text-lg underline-offset-4 hover:underline transition-colors duration-200 flex items-center justify-center py-4"
+                >
+                  Not sure what you need? Describe your idea instead →
+                </Link>
+              </div>
+              
+              {/* Trust indicators */}
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <p className="text-sm text-gray-500 mb-4 font-medium">Works with your favorite AI website builders:</p>
+                <div className="flex items-center justify-center lg:justify-start space-x-8 text-gray-400">
+                  <span className="font-semibold text-lg">Framer</span>
+                  <span className="font-semibold text-lg">Webflow</span>
+                  <span className="font-semibold text-lg">Cursor</span>
+                  <span className="font-semibold text-lg">v0.dev</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right Illustration */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                {/* Main illustration container */}
+                <div className="w-80 h-80 lg:w-96 lg:h-96 bg-gradient-to-br from-white to-purple-50 rounded-3xl shadow-2xl border border-purple-100 flex items-center justify-center relative overflow-hidden">
+                  {/* AI Assistant Icon */}
+                  <div className="absolute top-8 left-8 w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-2xl">🤖</span>
+                  </div>
+                  
+                  {/* Website Wireframe */}
+                  <div className="w-64 h-48 bg-white rounded-lg shadow-lg border-2 border-gray-200 relative">
+                    {/* Header bar */}
+                    <div className="h-8 bg-gray-100 rounded-t-lg flex items-center px-3">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                        <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Content area */}
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gradient-to-r from-purple-200 to-blue-200 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-full"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                      <div className="mt-4 h-8 bg-gradient-to-r from-purple-400 to-blue-400 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Floating elements */}
+                  <div className="absolute top-20 right-4 w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                    <span className="text-lg">✨</span>
+                  </div>
+                  
+                  <div className="absolute bottom-20 left-4 w-10 h-10 bg-green-200 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                    <span className="text-sm">💡</span>
+                  </div>
+                </div>
+                
+                {/* Background decoration */}
+                <div className="absolute -z-10 top-4 left-4 w-80 h-80 lg:w-96 lg:h-96 bg-gradient-to-br from-purple-200 to-blue-200 rounded-3xl opacity-20"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
