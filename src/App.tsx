@@ -10,6 +10,8 @@ import Templates from "./pages/Templates";
 import Examples from "./pages/Examples";
 import About from "./pages/About";
 import FeedbackReview from "./pages/FeedbackReview";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfUse from "./pages/TermsOfUse";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/examples" element={<Examples />} />
           <Route path="/about" element={<About />} />
           <Route path="/feedback-review" element={<FeedbackReview />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-use" element={<TermsOfUse />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
