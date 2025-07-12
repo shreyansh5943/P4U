@@ -13,6 +13,7 @@ import BusinessIdeaAnalyzer from "@/components/BusinessIdeaAnalyzer";
 import PromptPreview from "@/components/PromptPreview";
 import GuidedQAWizard from "@/components/GuidedQAWizard";
 import { useToast } from "@/hooks/use-toast";
+import EmptyFormSuggestion from "@/components/EmptyFormSuggestion";
 
 interface FormData {
   websiteName: string;
@@ -45,6 +46,7 @@ const PromptBuilder = () => {
   });
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [guidedPrompt, setGuidedPrompt] = useState("");
+  const [showEmptyFormSuggestion, setShowEmptyFormSuggestion] = useState(false);
   const { toast } = useToast();
 
   const totalSteps = 6;
@@ -64,6 +66,26 @@ const PromptBuilder = () => {
     "Home", "About", "Services", "Portfolio", "Blog", "Contact", 
     "Shop", "FAQ", "Testimonials", "Team", "Pricing", "Privacy Policy"
   ];
+
+  const isFormEmpty = () => {
+    return !formData.websiteName && 
+           !formData.purpose && 
+           !formData.targetAudience && 
+           formData.features.length === 0 && 
+           !formData.designStyle && 
+           formData.pages.length === 0 && 
+           !formData.additionalInfo;
+  };
+
+  useState(() => {
+    const timer = setTimeout(() => {
+      if (isFormEmpty() && activeTab === "form") {
+        setShowEmptyFormSuggestion(true);
+      }
+    }, 5000); // Show after 5 seconds if form is still empty
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleFeatureChange = (feature: string, checked: boolean) => {
     setFormData(prev => ({
@@ -144,6 +166,42 @@ Please ensure the website is professional, user-friendly, and optimized for the 
 
   const handleGuidedPromptGenerated = (prompt: string) => {
     setGuidedPrompt(prompt);
+  };
+
+  const handleLetAIHelp = () => {
+    setShowEmptyFormSuggestion(false);
+    // Scroll to the Business Idea Analyzer section
+    const analyzerElement = document.querySelector('[data-testid="business-analyzer"]');
+    if (analyzerElement) {
+      analyzerElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleSkipForm = () => {
+    setShowEmptyFormSuggestion(false);
+    // Generate a basic prompt with default values
+    const basicPrompt = `Create a modern, professional website with the following features:
+
+Required Pages: Home, About, Contact
+
+Key Features:
+- Contact Form
+- Mobile Responsive Design
+- Clean Navigation
+- Professional Layout
+
+Design Style: Modern & Professional - Use clean layouts, appropriate color schemes, and ensure mobile responsiveness.
+
+Additional Requirements: Create a user-friendly website that looks professional and works well on all devices.
+
+Please ensure the website is professional, user-friendly, and optimized for general use. Include proper navigation, clear call-to-action buttons, and maintain consistent branding throughout.`;
+
+    setGeneratedPrompt(basicPrompt);
+    setActiveTab("form");
+  };
+
+  const handleDismissSuggestion = () => {
+    setShowEmptyFormSuggestion(false);
   };
 
   const renderStep = () => {
@@ -284,7 +342,9 @@ Please ensure the website is professional, user-friendly, and optimized for the 
           </p>
         </div>
 
-        <BusinessIdeaAnalyzer onUseSuggestions={handleUseSuggestions} />
+        <div data-testid="business-analyzer">
+          <BusinessIdeaAnalyzer onUseSuggestions={handleUseSuggestions} />
+        </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 mb-8">
@@ -295,6 +355,14 @@ Please ensure the website is professional, user-friendly, and optimized for the 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
               <TabsContent value="form">
+                {showEmptyFormSuggestion && isFormEmpty() && (
+                  <EmptyFormSuggestion
+                    onLetAIHelp={handleLetAIHelp}
+                    onSkip={handleSkipForm}
+                    onDismiss={handleDismissSuggestion}
+                  />
+                )}
+                
                 <Card className="shadow-lg">
                   <CardHeader>
                     <div className="flex items-center justify-between">
