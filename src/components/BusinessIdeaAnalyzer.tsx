@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, ArrowRight } from "lucide-react";
+import { Lightbulb, ArrowRight, AlertCircle } from "lucide-react";
 
 interface BusinessSuggestions {
   suggestedPages: string[];
@@ -23,6 +23,7 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
   const [businessIdea, setBusinessIdea] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestions, setSuggestions] = useState<BusinessSuggestions | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const analyzeBusiness = async () => {
@@ -36,7 +37,11 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
     }
 
     setIsAnalyzing(true);
+    setError(null);
+    
     try {
+      console.log('Calling analyze-business-idea function with:', businessIdea);
+      
       const { data, error } = await supabase.functions.invoke('analyze-business-idea', {
         body: { 
           businessIdea: businessIdea.trim(),
@@ -44,10 +49,39 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
         }
       });
 
-      if (error) throw error;
+      console.log('Function response:', { data, error });
 
-      const parsedSuggestions = JSON.parse(data.result);
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to analyze business idea');
+      }
+
+      if (!data || !data.result) {
+        throw new Error('No result received from analysis');
+      }
+
+      let parsedSuggestions;
+      try {
+        // Try to parse the result as JSON
+        parsedSuggestions = JSON.parse(data.result);
+      } catch (parseError) {
+        console.error('Failed to parse JSON result:', data.result);
+        // If it's not JSON, try to extract JSON from the text
+        const jsonMatch = data.result.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsedSuggestions = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('Invalid response format from AI service');
+        }
+      }
+
+      // Validate the parsed suggestions
+      if (!parsedSuggestions.suggestedPages || !Array.isArray(parsedSuggestions.suggestedPages)) {
+        throw new Error('Invalid suggestions format received');
+      }
+
       setSuggestions(parsedSuggestions);
+      setError(null);
       
       toast({
         title: "Analysis Complete!",
@@ -55,9 +89,12 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
       });
     } catch (error) {
       console.error('Error analyzing business idea:', error);
+      const errorMessage = error.message || 'Unable to analyze your business idea. Please try again.';
+      setError(errorMessage);
+      
       toast({
         title: "Analysis Failed",
-        description: "Unable to analyze your business idea. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -107,6 +144,16 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
         >
           {isAnalyzing ? "Analyzing..." : "Analyze My Idea"}
         </Button>
+
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2 text-red-700">
+              <AlertCircle className="w-4 h-4" />
+              <span className="font-medium">Analysis Error</span>
+            </div>
+            <p className="text-red-600 text-sm mt-1">{error}</p>
+          </div>
+        )}
 
         {suggestions && (
           <Card className="mt-6 bg-white border border-green-200">
