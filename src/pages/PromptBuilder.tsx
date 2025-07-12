@@ -14,6 +14,7 @@ import PromptPreview from "@/components/PromptPreview";
 import GuidedQAWizard from "@/components/GuidedQAWizard";
 import { useToast } from "@/hooks/use-toast";
 import EmptyFormSuggestion from "@/components/EmptyFormSuggestion";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
   websiteName: string;
@@ -47,6 +48,7 @@ const PromptBuilder = () => {
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [guidedPrompt, setGuidedPrompt] = useState("");
   const [showEmptyFormSuggestion, setShowEmptyFormSuggestion] = useState(false);
+  const [isGeneratingAISuggestions, setIsGeneratingAISuggestions] = useState(false);
   const { toast } = useToast();
 
   const totalSteps = 6;
@@ -86,6 +88,79 @@ const PromptBuilder = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const generateAISuggestions = async () => {
+    setIsGeneratingAISuggestions(true);
+    
+    try {
+      console.log('Generating AI suggestions for empty form...');
+      
+      const { data, error } = await supabase.functions.invoke('analyze-business-idea', {
+        body: { 
+          businessIdea: "I want to create a professional website for my business but I'm not sure what features or pages I need. Please suggest a good starting point for a general business website.",
+          analysisType: 'business-analysis'
+        }
+      });
+
+      console.log('AI suggestions response:', { data, error });
+
+      if (error) {
+        console.error('Error generating AI suggestions:', error);
+        throw new Error(error.message || 'Failed to generate suggestions');
+      }
+
+      if (!data || !data.result) {
+        throw new Error('No suggestions received');
+      }
+
+      let parsedSuggestions;
+      try {
+        parsedSuggestions = JSON.parse(data.result);
+      } catch (parseError) {
+        console.error('Failed to parse JSON result:', data.result);
+        const jsonMatch = data.result.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsedSuggestions = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('Invalid response format from AI service');
+        }
+      }
+
+      // Apply the suggestions to the form
+      setFormData(prev => ({
+        ...prev,
+        websiteName: "My Business Website",
+        purpose: "Create a professional online presence for my business",
+        targetAudience: "Potential customers and business partners",
+        pages: parsedSuggestions.suggestedPages || ["Home", "About", "Services", "Contact"],
+        features: parsedSuggestions.suggestedFeatures || ["Contact Form", "Testimonials", "Gallery"],
+        designStyle: parsedSuggestions.suggestedDesignStyle || "Modern & Professional"
+      }));
+
+      setShowEmptyFormSuggestion(false);
+      
+      toast({
+        title: "AI Suggestions Applied!",
+        description: "Your form has been pre-filled with AI recommendations. You can modify any field as needed.",
+      });
+    } catch (error) {
+      console.error('Error generating AI suggestions:', error);
+      
+      toast({
+        title: "Couldn't Generate Suggestions",
+        description: "Let's try the Business Idea Analyzer instead.",
+        variant: "destructive"
+      });
+      
+      // Fallback to scrolling to Business Idea Analyzer
+      const analyzerElement = document.querySelector('[data-testid="business-analyzer"]');
+      if (analyzerElement) {
+        analyzerElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    } finally {
+      setIsGeneratingAISuggestions(false);
+    }
+  };
 
   const handleFeatureChange = (feature: string, checked: boolean) => {
     setFormData(prev => ({
@@ -169,12 +244,7 @@ Please ensure the website is professional, user-friendly, and optimized for the 
   };
 
   const handleLetAIHelp = () => {
-    setShowEmptyFormSuggestion(false);
-    // Scroll to the Business Idea Analyzer section
-    const analyzerElement = document.querySelector('[data-testid="business-analyzer"]');
-    if (analyzerElement) {
-      analyzerElement.scrollIntoView({ behavior: 'smooth' });
-    }
+    generateAISuggestions();
   };
 
   const handleSkipForm = () => {
@@ -368,6 +438,9 @@ Please ensure the website is professional, user-friendly, and optimized for gene
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-2xl">
                         Step {currentStep} of {totalSteps}
+                        {isGeneratingAISuggestions && (
+                          <span className="text-sm text-blue-600 ml-2">(AI is filling this out...)</span>
+                        )}
                       </CardTitle>
                       <div className="text-sm text-gray-500">
                         {Math.round((currentStep / totalSteps) * 100)}% Complete
@@ -387,13 +460,14 @@ Please ensure the website is professional, user-friendly, and optimized for gene
                       <Button
                         variant="outline"
                         onClick={prevStep}
-                        disabled={currentStep === 1}
+                        disabled={currentStep === 1 || isGeneratingAISuggestions}
                         className="px-8"
                       >
                         Previous
                       </Button>
                       <Button
                         onClick={nextStep}
+                        disabled={isGeneratingAISuggestions}
                         className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8"
                       >
                         {currentStep === totalSteps ? "Generate Prompt" : "Next"}
