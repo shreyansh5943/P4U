@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import InteractiveReviewsSection from "@/components/InteractiveReviewsSection";
 
 const Index = () => {
   return (
@@ -120,9 +119,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Interactive Reviews Section */}
-      <InteractiveReviewsSection />
 
       {/* How It Works Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
