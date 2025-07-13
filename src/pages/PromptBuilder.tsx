@@ -15,6 +15,9 @@ import GuidedQAWizard from "@/components/GuidedQAWizard";
 import { useToast } from "@/hooks/use-toast";
 import EmptyFormSuggestion from "@/components/EmptyFormSuggestion";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
+import { Lock, AlertCircle } from "lucide-react";
 
 interface FormData {
   websiteName: string;
@@ -34,6 +37,7 @@ interface BusinessSuggestions {
 }
 
 const PromptBuilder = () => {
+  const { user, remainingAIUses, refreshUsage } = useAuth();
   const [activeTab, setActiveTab] = useState("form");
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
@@ -89,7 +93,66 @@ const PromptBuilder = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const checkAIUsageAndIncrement = async (): Promise<boolean> => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use AI features.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (remainingAIUses <= 0) {
+      toast({
+        title: "Daily Limit Reached",
+        description: "You've reached your daily limit of 5 AI uses. Try again tomorrow!",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('increment_ai_usage', {
+        user_uuid: user.id
+      });
+
+      if (error) {
+        console.error('Error incrementing AI usage:', error);
+        toast({
+          title: "Usage Error",
+          description: "Unable to track AI usage. Please try again.",
+          variant: "destructive"
+        });
+        return false;
+      }
+
+      if (!data) {
+        toast({
+          title: "Daily Limit Reached",
+          description: "You've reached your daily limit of 5 AI uses. Try again tomorrow!",
+          variant: "destructive"
+        });
+        return false;
+      }
+
+      // Refresh usage count
+      await refreshUsage();
+      return true;
+    } catch (error) {
+      console.error('Error checking AI usage:', error);
+      toast({
+        title: "Usage Error",
+        description: "Unable to track AI usage. Please try again.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
   const generateAISuggestions = async () => {
+    if (!(await checkAIUsageAndIncrement())) return;
+    
     setIsGeneratingAISuggestions(true);
     
     try {
@@ -230,6 +293,15 @@ Please ensure the website is professional, user-friendly, and optimized for the 
   };
 
   const handleUseSuggestions = (suggestions: BusinessSuggestions) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use AI suggestions.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       pages: suggestions.suggestedPages,
@@ -239,7 +311,8 @@ Please ensure the website is professional, user-friendly, and optimized for the 
     setActiveTab("form");
   };
 
-  const handleGuidedPromptGenerated = (prompt: string) => {
+  const handleGuidedPromptGenerated = async (prompt: string) => {
+    if (!(await checkAIUsageAndIncrement())) return;
     setGuidedPrompt(prompt);
   };
 
@@ -400,6 +473,29 @@ Please ensure the website is professional, user-friendly, and optimized for gene
 
   const currentPrompt = activeTab === "form" ? generatedPrompt : guidedPrompt;
 
+  // Authentication requirement banner component
+  const AuthRequiredBanner = () => (
+    <Card className="mb-8 border-amber-200 bg-amber-50">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600" />
+          <div className="flex-1">
+            <h3 className="font-semibold text-amber-800">Authentication Required</h3>
+            <p className="text-amber-700 mt-1">
+              Please sign in to use AI features. You get 5 free AI suggestions per day!
+            </p>
+          </div>
+          <Button asChild variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+            <Link to="/auth">
+              <Lock className="w-4 h-4 mr-2" />
+              Sign In
+            </Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 font-inter">
       <Navigation />
@@ -410,7 +506,14 @@ Please ensure the website is professional, user-friendly, and optimized for gene
           <p className="text-xl text-gray-600">
             Choose your preferred method to create the perfect prompt for your AI website builder
           </p>
+          {user && (
+            <p className="text-sm text-gray-500 mt-2">
+              AI uses remaining today: {remainingAIUses}/5
+            </p>
+          )}
         </div>
+
+        {!user && <AuthRequiredBanner />}
 
         <div data-testid="business-analyzer">
           <BusinessIdeaAnalyzer onUseSuggestions={handleUseSuggestions} />

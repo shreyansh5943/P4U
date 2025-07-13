@@ -1,467 +1,166 @@
+
+import { ArrowRight, Sparkles, Zap, Target, CheckCircle, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Share2, MessageCircle, ThumbsUp } from "lucide-react";
-import { useState } from "react";
+import InteractiveReviewsSection from "@/components/InteractiveReviewsSection";
 
 const Index = () => {
-  const [comments, setComments] = useState([
-    { id: 1, user: "Sarah M.", text: "This tool saved me hours! The prompts work perfectly with Framer.", likes: 12 },
-    { id: 2, user: "Mike D.", text: "Love how specific the AI gets with the prompts. Very helpful!", likes: 8 }
-  ]);
-  const [newComment, setNewComment] = useState("");
-
-  const handleAddComment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      const comment = {
-        id: comments.length + 1,
-        user: "Anonymous",
-        text: newComment.trim(),
-        likes: 0
-      };
-      setComments([...comments, comment]);
-      setNewComment("");
-    }
-  };
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Prompt4U - AI Website Prompts',
-        text: 'Turn your website ideas into reality with AI-powered prompts',
-        url: window.location.origin,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.origin);
-      alert('Link copied to clipboard!');
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-white font-inter scroll-smooth">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 font-inter">
       <Navigation />
       
-      {/* Enhanced Hero Section */}
-      <section className="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 py-12 sm:py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left Content */}
-            <div className="text-center lg:text-left animate-fade-in">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-                Turn Your Website Idea Into Reality —{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
-                  No Code, Just Smart Prompts
-                </span>
-              </h1>
-              
-              <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                Prompt4U helps you generate the perfect AI prompt to build your dream website in tools like Framer, Webflow, and more.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-6">
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Create Perfect
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                {" "}AI Prompts
+              </span>
+              <br />
+              for Your Website
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Transform your ideas into detailed, professional prompts that AI website builders understand perfectly. 
+              No technical knowledge required.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button asChild size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg">
                 <Link to="/prompt-builder">
-                  <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-base sm:text-lg font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                    🪄 Start Building Your Prompt
-                  </Button>
+                  Start Building Your Prompt
+                  <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
-                
-                <button
-                  onClick={handleShare}
-                  className="flex items-center justify-center gap-2 text-purple-600 hover:text-purple-700 font-medium text-base sm:text-lg underline-offset-4 hover:underline transition-colors duration-200 py-3 sm:py-4"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Share Prompt4U
-                </button>
-              </div>
-              
-              <Link 
-                to="/prompt-builder" 
-                className="text-purple-600 hover:text-purple-700 font-medium text-sm sm:text-base underline-offset-4 hover:underline transition-colors duration-200 block"
-              >
-                Not sure what you need? Describe your idea instead →
-              </Link>
-              
-              {/* Trust indicators */}
-              <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
-                <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4 font-medium">Works with your favorite AI website builders:</p>
-                <div className="flex items-center justify-center lg:justify-start space-x-4 sm:space-x-8 text-gray-400 flex-wrap">
-                  <span className="font-semibold text-sm sm:text-lg mb-2 sm:mb-0">Framer</span>
-                  <span className="font-semibold text-sm sm:text-lg mb-2 sm:mb-0">Webflow</span>
-                  <span className="font-semibold text-sm sm:text-lg mb-2 sm:mb-0">Cursor</span>
-                  <span className="font-semibold text-sm sm:text-lg mb-2 sm:mb-0">v0.dev</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Right Illustration */}
-            <div className="flex justify-center lg:justify-end animate-fade-in">
-              <div className="relative">
-                {/* Main illustration container */}
-                <div className="w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 bg-gradient-to-br from-white to-purple-50 rounded-3xl shadow-2xl border border-purple-100 flex items-center justify-center relative overflow-hidden">
-                  {/* AI Assistant Icon */}
-                  <div className="absolute top-6 sm:top-8 left-6 sm:left-8 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                    <span className="text-lg sm:text-2xl">🤖</span>
-                  </div>
-                  
-                  {/* Website Wireframe */}
-                  <div className="w-56 h-40 sm:w-64 sm:h-48 bg-white rounded-lg shadow-lg border-2 border-gray-200 relative">
-                    {/* Header bar */}
-                    <div className="h-6 sm:h-8 bg-gray-100 rounded-t-lg flex items-center px-2 sm:px-3">
-                      <div className="flex space-x-1">
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-400 rounded-full"></div>
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-400 rounded-full"></div>
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full"></div>
-                      </div>
-                    </div>
-                    
-                    {/* Content area */}
-                    <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-                      <div className="h-3 sm:h-4 bg-gradient-to-r from-purple-200 to-blue-200 rounded w-3/4 animate-pulse"></div>
-                      <div className="h-2 sm:h-3 bg-gray-200 rounded w-full"></div>
-                      <div className="h-2 sm:h-3 bg-gray-200 rounded w-2/3"></div>
-                      <div className="mt-3 sm:mt-4 h-6 sm:h-8 bg-gradient-to-r from-purple-400 to-blue-400 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                  
-                  {/* Floating elements */}
-                  <div className="absolute top-16 sm:top-20 right-3 sm:right-4 w-10 h-10 sm:w-12 sm:h-12 bg-yellow-200 rounded-full flex items-center justify-center shadow-lg animate-bounce">
-                    <span className="text-sm sm:text-lg">✨</span>
-                  </div>
-                  
-                  <div className="absolute bottom-16 sm:bottom-20 left-3 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-green-200 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                    <span className="text-xs sm:text-sm">💡</span>
-                  </div>
-                </div>
-                
-                {/* Background decoration */}
-                <div className="absolute -z-10 top-3 sm:top-4 left-3 sm:left-4 w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 bg-gradient-to-br from-purple-200 to-blue-200 rounded-3xl opacity-20"></div>
-              </div>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="px-8 py-6 text-lg">
+                <Link to="/examples">
+                  View Examples
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-20 bg-gray-50" id="features">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-              AI-Powered Website Building Features
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Our AI Prompt Builder?
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600">
-              Unleash the power of AI to create stunning websites with ease.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Get professional results without the complexity. Our tool guides you through every step.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {/* Feature 1 */}
-            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in">
-              <div className="text-3xl sm:text-4xl text-blue-600 mb-3 sm:mb-4">💡</div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                Intelligent Prompt Generation
-              </h3>
-              <p className="text-gray-700">
-                Our AI analyzes your requirements and generates optimized prompts for website builders.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="text-center p-8 border-2 hover:border-purple-200 transition-colors">
+              <CardContent className="pt-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">AI-Powered Suggestions</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Get intelligent recommendations based on your business type and goals. Our AI understands what works.
+                </p>
+              </CardContent>
+            </Card>
             
-            {/* Feature 2 */}
-            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in">
-              <div className="text-3xl sm:text-4xl text-green-600 mb-3 sm:mb-4">🎨</div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                Customizable Design Options
-              </h3>
-              <p className="text-gray-700">
-                Tailor your website's design with a wide range of styles, layouts, and color schemes.
-              </p>
-            </div>
+            <Card className="text-center p-8 border-2 hover:border-purple-200 transition-colors">
+              <CardContent className="pt-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Lightning Fast</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Create comprehensive website prompts in minutes, not hours. Streamline your entire workflow.
+                </p>
+              </CardContent>
+            </Card>
             
-            {/* Feature 3 */}
-            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in">
-              <div className="text-3xl sm:text-4xl text-purple-600 mb-3 sm:mb-4">🚀</div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                Real-Time Preview
-              </h3>
-              <p className="text-gray-700">
-                See your website come to life in real-time as you adjust the prompts and settings.
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in">
-              <div className="text-3xl sm:text-4xl text-orange-600 mb-3 sm:mb-4">📱</div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                Mobile-Responsive Design
-              </h3>
-              <p className="text-gray-700">
-                Ensure your website looks stunning on any device with our mobile-responsive design features.
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in">
-              <div className="text-3xl sm:text-4xl text-red-600 mb-3 sm:mb-4">✍️</div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                AI Content Generation
-              </h3>
-              <p className="text-gray-700">
-                Generate compelling website content, including headlines, descriptions, and more, using AI.
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in">
-              <div className="text-3xl sm:text-4xl text-teal-600 mb-3 sm:mb-4">✅</div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                SEO Optimization
-              </h3>
-              <p className="text-gray-700">
-                Improve your website's visibility on search engines with our built-in SEO optimization tools.
-              </p>
-            </div>
+            <Card className="text-center p-8 border-2 hover:border-purple-200 transition-colors">
+              <CardContent className="pt-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Target className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Precision Targeting</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Tailor your prompts to your exact audience and business needs with our guided approach.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
+
+      {/* Interactive Reviews Section */}
+      <InteractiveReviewsSection />
 
       {/* How It Works Section */}
-      <section className="py-16 sm:py-20" id="how-it-works">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
               How It Works
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600">
-              Create your dream website in three simple steps.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Three simple steps to get your perfect AI prompt
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {/* Step 1 */}
-            <div className="text-center animate-fade-in">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl font-semibold transition-all duration-300 hover:scale-110">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-xl">
                 1
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                Describe Your Vision
-              </h3>
-              <p className="text-gray-700">
-                Tell our AI about your website idea, target audience, and desired features.
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Describe Your Vision</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Tell us about your business, target audience, and what you want your website to achieve.
               </p>
             </div>
             
-            {/* Step 2 */}
-            <div className="text-center animate-fade-in">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl font-semibold transition-all duration-300 hover:scale-110">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-xl">
                 2
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                Generate AI Prompts
-              </h3>
-              <p className="text-gray-700">
-                Our AI generates optimized prompts tailored to your specific needs.
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Get AI Suggestions</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Our AI analyzes your requirements and suggests features, pages, and design styles.
               </p>
             </div>
             
-            {/* Step 3 */}
-            <div className="text-center animate-fade-in">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl font-semibold transition-all duration-300 hover:scale-110">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-xl">
                 3
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                Build Your Website
-              </h3>
-              <p className="text-gray-700">
-                Use the generated prompts in your favorite AI website builder to bring your vision to life.
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Copy & Use</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Get your optimized prompt and use it with any AI website builder for perfect results.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Community Comments Section */}
-      <section className="py-16 sm:py-20 bg-gray-50" id="community-comments">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-              What Our Community Says
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-600">
-              Join the conversation and share your experience with Prompt4U.
-            </p>
-          </div>
-          
-          {/* Comments Display */}
-          <div className="space-y-4 sm:space-y-6 mb-8">
-            {comments.map((comment) => (
-              <div key={comment.id} className="bg-white rounded-lg shadow-md p-4 sm:p-6 animate-fade-in">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-2">{comment.user}</h4>
-                    <p className="text-gray-700 mb-3">{comment.text}</p>
-                    <button className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 transition-colors">
-                      <ThumbsUp className="w-4 h-4" />
-                      <span className="text-sm">{comment.likes}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Add Comment Form */}
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 animate-fade-in">
-            <form onSubmit={handleAddComment} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Share your thoughts about Prompt4U
-                </label>
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none"
-                  placeholder="Tell us about your experience with Prompt4U..."
-                />
-              </div>
-              <Button 
-                type="submit"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium px-6 py-2 rounded-lg transition-all duration-300"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Add Comment
-              </Button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      {/* Join Our Community Section */}
-      <section className="py-16 sm:py-20 bg-gradient-to-r from-purple-600 to-blue-600" id="community">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 animate-fade-in">Join Our Community</h2>
-          <p className="text-lg sm:text-xl text-purple-100 mb-8 sm:mb-12 max-w-2xl mx-auto animate-fade-in">
-            Connect with other creators, share your websites, and get help from our community
-          </p>
-          
-          <div className="flex justify-center animate-fade-in">
-            <a
-              href="https://discord.gg/S3K84jr4"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all duration-300 flex items-center gap-3 text-base sm:text-lg hover:scale-105 hover:shadow-lg"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
-              </svg>
-              Join Discord
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Feedback Section */}
-      <section className="py-16 sm:py-20 bg-gray-50" id="feedback">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-              We'd Love Your Feedback
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-600">
-              Help us improve Prompt4U by sharing your thoughts and suggestions.
-            </p>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 animate-fade-in">
-            <form className="space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter your name"
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter your email"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="feedback-type" className="block text-sm font-medium text-gray-700 mb-2">
-                  Feedback Type
-                </label>
-                <select
-                  id="feedback-type"
-                  name="type"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                >
-                  <option value="">Select feedback type</option>
-                  <option value="review">General Review</option>
-                  <option value="issue">Bug Report</option>
-                  <option value="suggestion">Feature Suggestion</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none"
-                  placeholder="Share your thoughts, suggestions, or report any issues..."
-                ></textarea>
-              </div>
-              
-              <div className="text-center">
-                <Button 
-                  type="submit"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                >
-                  Send Feedback
-                </Button>
-              </div>
-            </form>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-20 bg-white" id="get-started">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 animate-fade-in">
-            Ready to Get Started?
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-600 to-pink-600">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Ready to Create Your Perfect Website Prompt?
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 mb-8 sm:mb-12 animate-fade-in">
-            Join thousands of creators and build your dream website today.
+          <p className="text-xl text-purple-100 mb-8 leading-relaxed">
+            Join thousands of satisfied users who have transformed their web development process
           </p>
-          <div className="animate-fade-in">
+          <Button asChild size="lg" variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-6 text-lg">
             <Link to="/prompt-builder">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-base sm:text-lg font-medium px-6 sm:px-8 py-3 rounded-md transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                Start Building Now
-              </Button>
+              Get Started Now - It's Free
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-          </div>
+          </Button>
         </div>
       </section>
       

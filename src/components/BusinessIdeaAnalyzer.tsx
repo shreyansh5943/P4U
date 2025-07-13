@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, ArrowRight, AlertCircle } from "lucide-react";
+import { Lightbulb, ArrowRight, AlertCircle, Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 interface BusinessSuggestions {
   suggestedPages: string[];
@@ -25,8 +26,27 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
   const [suggestions, setSuggestions] = useState<BusinessSuggestions | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user, remainingAIUses, refreshUsage } = useAuth();
 
   const analyzeBusiness = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use AI features.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (remainingAIUses <= 0) {
+      toast({
+        title: "Daily Limit Reached",
+        description: "You've reached your daily limit of 5 AI uses. Try again tomorrow!",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!businessIdea.trim()) {
       toast({
         title: "Please describe your business idea",
@@ -40,6 +60,20 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
     setError(null);
     
     try {
+      // First increment usage
+      const { data: canUse, error: usageError } = await supabase.rpc('increment_ai_usage', {
+        user_uuid: user.id
+      });
+
+      if (usageError || !canUse) {
+        toast({
+          title: "Daily Limit Reached",
+          description: "You've reached your daily limit of 5 AI uses. Try again tomorrow!",
+          variant: "destructive"
+        });
+        return;
+      }
+
       console.log('Calling analyze-business-idea function with:', businessIdea);
       
       const { data, error } = await supabase.functions.invoke('analyze-business-idea', {
@@ -83,6 +117,9 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
       setSuggestions(parsedSuggestions);
       setError(null);
       
+      // Refresh usage count
+      await refreshUsage();
+      
       toast({
         title: "Analysis Complete!",
         description: "We've generated suggestions based on your business idea.",
@@ -122,8 +159,30 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
         <p className="text-gray-600">
           Describe your business or idea in one sentence, and we'll suggest the perfect website structure for you.
         </p>
+        {user && (
+          <p className="text-sm text-gray-500">
+            AI uses remaining: {remainingAIUses}/5
+          </p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
+        {!user && (
+          <Card className="border-amber-200 bg-amber-50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Lock className="w-5 h-5 text-amber-600" />
+                <div className="flex-1">
+                  <p className="text-amber-800 font-medium">Sign in required</p>
+                  <p className="text-amber-700 text-sm">Please sign in to use AI analysis features</p>
+                </div>
+                <Button asChild variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         <div>
           <Label htmlFor="businessIdea" className="font-medium">
             Describe your business or idea
@@ -134,12 +193,13 @@ const BusinessIdeaAnalyzer = ({ onUseSuggestions }: BusinessIdeaAnalyzerProps) =
             value={businessIdea}
             onChange={(e) => setBusinessIdea(e.target.value)}
             className="mt-2"
+            disabled={!user}
           />
         </div>
         
         <Button
           onClick={analyzeBusiness}
-          disabled={isAnalyzing || !businessIdea.trim()}
+          disabled={isAnalyzing || !businessIdea.trim() || !user}
           className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
         >
           {isAnalyzing ? "Analyzing..." : "Analyze My Idea"}

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, ArrowRight, Wand2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface GuidedQAWizardProps {
   onPromptGenerated: (prompt: string) => void;
@@ -24,6 +25,7 @@ const GuidedQAWizard = ({ onPromptGenerated }: GuidedQAWizardProps) => {
     additionalInfo: ""
   });
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const totalSteps = 5;
 
@@ -82,6 +84,15 @@ const GuidedQAWizard = ({ onPromptGenerated }: GuidedQAWizardProps) => {
   };
 
   const generatePrompt = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use AI features.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsGenerating(true);
     try {
       const qaData = `
