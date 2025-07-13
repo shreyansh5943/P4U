@@ -50,7 +50,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Our AI Prompt Builder?
+              Why Choose Prompt4U?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Get professional results without the complexity. Our tool guides you through every step.

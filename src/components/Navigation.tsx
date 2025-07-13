@@ -14,7 +14,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
             <Wand2 className="h-8 w-8 text-purple-600" />
-            <span className="text-xl font-bold text-gray-900">AI Prompt Builder</span>
+            <span className="text-xl font-bold text-gray-900">Prompt4U</span>
           </Link>
           
           {/* Desktop Navigation */}
