@@ -50,9 +50,12 @@ const PromptBuilder = () => {
     additionalInfo: ""
   });
   const [generatedPrompt, setGeneratedPrompt] = useState("");
+  const [staticPrompt, setStaticPrompt] = useState("");
+  const [aiEnhancedPrompt, setAiEnhancedPrompt] = useState("");
   const [guidedPrompt, setGuidedPrompt] = useState("");
   const [showEmptyFormSuggestion, setShowEmptyFormSuggestion] = useState(false);
   const [isGeneratingAISuggestions, setIsGeneratingAISuggestions] = useState(false);
+  const [isGeneratingAIPrompt, setIsGeneratingAIPrompt] = useState(false);
   const { toast } = useToast();
 
   const totalSteps = 6;
@@ -244,22 +247,79 @@ const PromptBuilder = () => {
   };
 
   const generatePrompt = () => {
-    const prompt = `Create a ${formData.designStyle.toLowerCase()} website called "${formData.websiteName}" for ${formData.purpose}. 
+    // Generate static structured prompt
+    const structured = `WEBSITE CREATION PROMPT
 
-Target Audience: ${formData.targetAudience}
+• PROJECT NAME: ${formData.websiteName || "My Business Website"}
 
-Required Pages: ${formData.pages.join(", ")}
+• PURPOSE & GOALS:
+  - Primary objective: ${formData.purpose || "Professional business website"}
+  - Target audience: ${formData.targetAudience || "General audience"}
 
-Key Features to Include:
-${formData.features.map(feature => `- ${feature}`).join("\n")}
+• REQUIRED PAGES:
+${formData.pages.map(page => `  - ${page}`).join("\n") || "  - Home\n  - About\n  - Contact"}
 
-Design Style: ${formData.designStyle} - Use modern layouts, appropriate color schemes, and ensure mobile responsiveness.
+• ESSENTIAL FEATURES:
+${formData.features.map(feature => `  - ${feature}`).join("\n") || "  - Contact Form\n  - Mobile Responsive Design"}
 
-Additional Requirements: ${formData.additionalInfo || "None specified"}
+• DESIGN SPECIFICATIONS:
+  - Style: ${formData.designStyle || "Modern & Professional"}
+  - Responsive design for all devices
+  - Clean and intuitive navigation
+  - Consistent branding throughout
 
-Please ensure the website is professional, user-friendly, and optimized for the target audience. Include proper navigation, clear call-to-action buttons, and maintain consistent branding throughout.`;
+• TECHNICAL REQUIREMENTS:
+  - Mobile-first responsive design
+  - Fast loading times
+  - SEO-optimized structure
+  - Cross-browser compatibility
 
-    setGeneratedPrompt(prompt);
+• ADDITIONAL SPECIFICATIONS:
+${formData.additionalInfo || "None specified"}
+
+• DELIVERABLES:
+  - Fully functional website
+  - Professional appearance
+  - User-friendly interface
+  - Clear call-to-action elements`;
+
+    setStaticPrompt(structured);
+    setGeneratedPrompt(structured);
+  };
+
+  const generateAIEnhancedPrompt = async () => {
+    if (!(await checkAIUsageAndIncrement())) return;
+    
+    setIsGeneratingAIPrompt(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('improve-prompt', {
+        body: { 
+          originalPrompt: staticPrompt,
+          improvementType: 'creative-enhancement'
+        }
+      });
+
+      if (error) {
+        console.error('Error generating AI prompt:', error);
+        throw new Error(error.message || 'Failed to generate AI enhanced prompt');
+      }
+
+      if (data && data.improvedPrompt) {
+        setAiEnhancedPrompt(data.improvedPrompt);
+      } else {
+        throw new Error('No enhanced prompt received');
+      }
+    } catch (error) {
+      console.error('Error in AI prompt enhancement:', error);
+      toast({
+        title: "AI Enhancement Failed",
+        description: "Unable to generate AI enhanced prompt. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingAIPrompt(false);
+    }
   };
 
   const copyPrompt = (prompt: string) => {
@@ -585,14 +645,68 @@ Please ensure the website is professional, user-friendly, and optimized for gene
               </TabsContent>
             </div>
 
-            {/* Preview Section */}
+            {/* Dual Prompt Output Section */}
             <div className="space-y-6">
-              <Card className="shadow-lg h-fit">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Your AI Prompt Preview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {currentPrompt ? (
+              {activeTab === "form" && staticPrompt ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Static Structured Prompt */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Structured Format</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-gray-100 rounded-lg p-4 font-mono text-sm leading-relaxed max-h-80 overflow-y-auto mb-4">
+                        {staticPrompt}
+                      </div>
+                      <Button
+                        onClick={() => copyPrompt(staticPrompt)}
+                        className="w-full bg-green-500 hover:bg-green-600 text-white mb-3"
+                      >
+                        Copy Static Prompt
+                      </Button>
+                      <Button
+                        onClick={generateAIEnhancedPrompt}
+                        disabled={isGeneratingAIPrompt || !user}
+                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                      >
+                        {isGeneratingAIPrompt ? "AI Innovating..." : "LET AI INNOVATE THIS"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* AI Enhanced Prompt */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="text-lg">AI Enhanced</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {aiEnhancedPrompt ? (
+                        <div>
+                          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 font-mono text-sm leading-relaxed max-h-80 overflow-y-auto mb-4">
+                            {aiEnhancedPrompt}
+                          </div>
+                          <Button
+                            onClick={() => copyPrompt(aiEnhancedPrompt)}
+                            className="w-full bg-primary hover:bg-primary/90 text-white"
+                          >
+                            Copy AI Enhanced Prompt
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="text-center py-12 text-gray-500">
+                          <div className="text-4xl mb-4">🤖</div>
+                          <p className="text-sm">Click "LET AI INNOVATE THIS" to generate an enhanced version</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              ) : currentPrompt ? (
+                <Card className="shadow-lg h-fit">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Your AI Prompt Preview</CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     <div className="space-y-4">
                       <div className="bg-gray-100 rounded-lg p-4 font-mono text-sm leading-relaxed max-h-96 overflow-y-auto">
                         {currentPrompt}
@@ -603,19 +717,22 @@ Please ensure the website is professional, user-friendly, and optimized for gene
                       >
                         Copy Prompt to Clipboard
                       </Button>
-                      <PromptPreview 
-                        prompt={currentPrompt} 
-                        websitePurpose={formData.purpose || "your website"}
-                      />
                     </div>
-                  ) : (
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="shadow-lg h-fit">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Your AI Prompt Preview</CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     <div className="text-center py-12 text-gray-500">
                       <div className="text-6xl mb-4">📝</div>
                       <p>Complete the form or guided Q&A to see your generated prompt here</p>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* AI Prompt Improver */}
               <PromptImprover 

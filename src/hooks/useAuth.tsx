@@ -18,11 +18,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [remainingAIUses, setRemainingAIUses] = useState(0);
+  const [remainingAIUses, setRemainingAIUses] = useState(5);
 
   const refreshUsage = async () => {
     if (!user) {
-      setRemainingAIUses(0);
+      setRemainingAIUses(5); // Default to 5 for non-authenticated users
       return;
     }
     
@@ -33,9 +33,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (!error && typeof data === 'number') {
         setRemainingAIUses(data);
+      } else {
+        // If there's an error or no data, default to 5 (new user)
+        setRemainingAIUses(5);
       }
     } catch (error) {
       console.error('Error checking AI usage:', error);
+      // Don't set to 0 on error, keep current value or default to 5
+      setRemainingAIUses(5);
     }
   };
 
@@ -53,7 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             refreshUsage();
           }, 0);
         } else {
-          setRemainingAIUses(0);
+          setRemainingAIUses(5); // Reset to 5 when user logs out
         }
       }
     );
@@ -76,7 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setRemainingAIUses(0);
+    setRemainingAIUses(5); // Reset to 5 for guest users
   };
 
   return (

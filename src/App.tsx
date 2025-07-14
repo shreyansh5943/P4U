@@ -11,6 +11,7 @@ import Templates from "./pages/Templates";
 import Examples from "./pages/Examples";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import FeedbackReview from "./pages/FeedbackReview";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/prompt-builder" element={<PromptBuilder />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/examples" element={<Examples />} />
             <Route path="/about" element={<About />} />

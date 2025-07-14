@@ -1,9 +1,10 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Wand2, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import UserAccountButton from "./UserAccountButton";
+import logoImage from "@/assets/prompt4u-logo.png";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,22 +14,22 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <Wand2 className="h-8 w-8 text-purple-600" />
+            <img src={logoImage} alt="Prompt4U" className="h-8 w-8" />
             <span className="text-xl font-bold text-gray-900">Prompt4U</span>
           </Link>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/prompt-builder" className="text-gray-700 hover:text-purple-600 transition-colors">
+            <Link to="/prompt-builder" className="text-gray-700 hover:text-primary transition-colors">
               Prompt Builder
             </Link>
-            <Link to="/templates" className="text-gray-700 hover:text-purple-600 transition-colors">
+            <Link to="/templates" className="text-gray-700 hover:text-primary transition-colors">
               Templates
             </Link>
-            <Link to="/examples" className="text-gray-700 hover:text-purple-600 transition-colors">
+            <Link to="/examples" className="text-gray-700 hover:text-primary transition-colors">
               Examples
             </Link>
-            <Link to="/about" className="text-gray-700 hover:text-purple-600 transition-colors">
+            <Link to="/about" className="text-gray-700 hover:text-primary transition-colors">
               About
             </Link>
             <UserAccountButton />
@@ -52,28 +53,28 @@ const Navigation = () => {
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
               <Link
                 to="/prompt-builder"
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors"
+                className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 Prompt Builder
               </Link>
               <Link
                 to="/templates"
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors"
+                className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 Templates
               </Link>
               <Link
                 to="/examples"
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors"
+                className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 Examples
               </Link>
               <Link
                 to="/about"
-                className="block px-3 py-2 text-gray-700 hover:text-purple-600 transition-colors"
+                className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 About

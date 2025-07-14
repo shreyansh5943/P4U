@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
-import { User, LogOut, LogIn } from "lucide-react";
+import { User, LogOut, LogIn, BarChart3 } from "lucide-react";
 
 const UserAccountButton = () => {
   const { user, signOut, remainingAIUses } = useAuth();
@@ -44,6 +44,12 @@ const UserAccountButton = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/dashboard" className="flex items-center w-full">
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Dashboard
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={signOut}>
           <LogOut className="w-4 h-4 mr-2" />
           Sign Out

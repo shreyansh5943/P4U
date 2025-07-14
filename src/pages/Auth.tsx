@@ -58,7 +58,7 @@ const Auth = () => {
       } else {
         toast({
           title: "Login Successful",
-          description: "Welcome back!",
+          description: "Welcome back to Prompt4U!",
         });
         navigate("/");
       }
@@ -122,7 +122,7 @@ const Auth = () => {
         });
       } else {
         toast({
-          title: "Sign Up Successful",
+          title: "Welcome to Prompt4U!",
           description: "Please check your email to confirm your account.",
         });
         setActiveTab("login");
@@ -142,7 +142,9 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Welcome to AI Prompt Builder</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            {activeTab === "login" ? "Login back to your account" : "Welcome to Prompt4U"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>

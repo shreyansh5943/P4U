@@ -12,7 +12,7 @@ const About = () => {
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">About PromptBuddy</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">About Prompt4U</h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             We're on a mission to make website creation accessible to everyone, 
             regardless of their technical background.
@@ -20,20 +20,6 @@ const About = () => {
         </div>
 
         <div className="prose prose-lg max-w-none">
-          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8 mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              PromptBuddy was born out of frustration. We watched countless creators, entrepreneurs, 
-              and small business owners struggle to communicate their website vision to AI builders. 
-              They had amazing ideas but couldn't translate them into the detailed prompts that AI 
-              tools needed to create great websites.
-            </p>
-            <p className="text-gray-700 leading-relaxed">
-              We realized that the gap wasn't in the AI technology—it was in the communication. 
-              So we built PromptBuddy to bridge that gap, turning simple ideas into comprehensive, 
-              professional prompts that get results.
-            </p>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <Card className="shadow-lg">
