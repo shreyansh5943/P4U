@@ -1,39 +1,39 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Starting business idea analysis...');
-    
-    const { businessIdea, analysisType } = await req.json();
-    console.log('Request data:', { businessIdea, analysisType });
+    console.log("Starting business idea analysis...");
+
+    const { businessIdea, analysisType, userId } = await req.json();
+    console.log("Request data:", { businessIdea, analysisType, userId });
 
     if (!geminiApiKey) {
-      console.error('GEMINI_API_KEY is not configured');
-      throw new Error('GEMINI_API_KEY is not configured');
+      console.error("GEMINI_API_KEY is not configured");
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
     if (!businessIdea || businessIdea.trim().length === 0) {
-      console.error('Business idea is empty or missing');
-      throw new Error('Business idea is required');
+      console.error("Business idea is empty or missing");
+      throw new Error("Business idea is required");
     }
 
-    let systemPrompt = '';
-    
-    if (analysisType === 'business-analysis') {
+    let systemPrompt = "";
+
+    if (analysisType === "business-analysis") {
       systemPrompt = `You are a helpful AI assistant that analyzes business ideas and suggests website structures. 
 
 Analyze this business idea: "${businessIdea}"
@@ -47,73 +47,115 @@ Return ONLY a valid JSON object with this exact structure (no additional text, n
 }
 
 Make sure the response is valid JSON that can be parsed directly.`;
-    } else if (analysisType === 'guided-qa') {
+    } else if (analysisType === "guided-qa") {
       systemPrompt = `Based on these Q&A responses, create a detailed website prompt. Format as a complete prompt ready for AI website builders:
 
 ${businessIdea}
 
 Create a professional prompt that includes website purpose, target audience, features, design style, and page structure. Make it detailed and actionable.`;
     } else {
-      throw new Error('Invalid analysis type');
+      throw new Error("Invalid analysis type");
     }
 
-    console.log('Making request to Gemini API...');
-    
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: systemPrompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-        },
-      }),
-    });
+    console.log("Making request to Gemini API...");
 
-    console.log('Gemini API response status:', response.status);
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: systemPrompt,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          },
+        }),
+      }
+    );
+
+    console.log("Gemini API response status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error response:', errorText);
+      console.error("Gemini API error response:", errorText);
       throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('Gemini API response data:', JSON.stringify(data, null, 2));
+    console.log("Gemini API response data:", JSON.stringify(data, null, 2));
 
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
-      console.error('Invalid response structure from Gemini API');
-      throw new Error('Invalid response from AI service');
+    if (
+      !data.candidates ||
+      !data.candidates[0] ||
+      !data.candidates[0].content ||
+      !data.candidates[0].content.parts ||
+      !data.candidates[0].content.parts[0]
+    ) {
+      console.error("Invalid response structure from Gemini API");
+      throw new Error("Invalid response from AI service");
     }
 
     const result = data.candidates[0].content.parts[0].text;
-    console.log('AI generated result:', result);
+    console.log("AI generated result:", result);
+
+    // Increment usage in Supabase
+    if (userId) {
+      try {
+        const today = new Date().toISOString().split("T")[0];
+        const usageRes = await fetch(
+          `${req.url.split("/functions/")[0]}/rest/v1/rpc/increment_ai_usage`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: req.headers.get("apikey") || "",
+              Authorization: req.headers.get("authorization") || "",
+            },
+            body: JSON.stringify({ user_id: userId, usage_date: today }),
+          }
+        );
+        if (!usageRes.ok) {
+          const usageErr = await usageRes.text();
+          console.error("Failed to increment usage:", usageErr);
+        }
+      } catch (usageError) {
+        console.error("Error incrementing usage:", usageError);
+      }
+    }
 
     return new Response(JSON.stringify({ result }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error('Error in analyze-business-idea function:', {
+    console.error("Error in analyze-business-idea function:", {
       message: error.message,
       stack: error.stack,
-      name: error.name
+      name: error.name,
     });
-    
-    return new Response(JSON.stringify({ 
-      error: error.message || 'An unexpected error occurred',
-      details: 'Please check the function logs for more information'
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+
+    return new Response(
+      JSON.stringify({
+        error: error.message || "An unexpected error occurred",
+        details: "Please check the function logs for more information",
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   }
 });

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +13,9 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
@@ -23,7 +25,9 @@ const Auth = () => {
   useEffect(() => {
     // Check if user is already logged in
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         navigate("/");
       }
@@ -37,7 +41,7 @@ const Auth = () => {
       toast({
         title: "Missing Information",
         description: "Please fill in all fields",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -53,7 +57,7 @@ const Auth = () => {
         toast({
           title: "Login Failed",
           description: error.message,
-          variant: "destructive"
+          variant: "destructive",
         });
       } else {
         toast({
@@ -66,7 +70,7 @@ const Auth = () => {
       toast({
         title: "Login Error",
         description: "An unexpected error occurred",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -75,11 +79,18 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !confirmPassword) {
+    if (
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !firstName ||
+      !lastName ||
+      !phone
+    ) {
       toast({
         title: "Missing Information",
         description: "Please fill in all fields",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -88,7 +99,7 @@ const Auth = () => {
       toast({
         title: "Password Mismatch",
         description: "Passwords do not match",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -97,7 +108,7 @@ const Auth = () => {
       toast({
         title: "Password Too Short",
         description: "Password must be at least 6 characters",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -105,22 +116,47 @@ const Auth = () => {
     setIsLoading(true);
     try {
       const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl
-        }
+          emailRedirectTo: redirectUrl,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+          },
+        },
       });
 
       if (error) {
         toast({
           title: "Sign Up Failed",
           description: error.message,
-          variant: "destructive"
+          variant: "destructive",
         });
       } else {
+        // Insert into profiles table if user is created
+        const userId = data?.user?.id;
+        if (userId) {
+          const { error: profileError } = await supabase
+            .from("profiles")
+            .insert([
+              {
+                id: userId,
+                first_name: firstName,
+                last_name: lastName,
+                phone: phone,
+              },
+            ]);
+          if (profileError) {
+            toast({
+              title: "Profile Save Error",
+              description: profileError.message,
+              variant: "destructive",
+            });
+          }
+        }
         toast({
           title: "Welcome to Prompt4U!",
           description: "Please check your email to confirm your account.",
@@ -131,7 +167,7 @@ const Auth = () => {
       toast({
         title: "Sign Up Error",
         description: "An unexpected error occurred",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -143,7 +179,9 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
-            {activeTab === "login" ? "Login back to your account" : "Welcome to Prompt4U"}
+            {activeTab === "login"
+              ? "Login back to your account"
+              : "Welcome to Prompt4U"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -152,7 +190,7 @@ const Auth = () => {
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
@@ -181,11 +219,17 @@ const Auth = () => {
                     className="absolute right-0 top-6 px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : (
+                  {isLoading ? (
+                    "Logging in..."
+                  ) : (
                     <>
                       <LogIn className="w-4 h-4 mr-2" />
                       Login
@@ -194,9 +238,39 @@ const Auth = () => {
                 </Button>
               </form>
             </TabsContent>
-            
+
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
+                <div>
+                  <Label htmlFor="first-name">First Name</Label>
+                  <Input
+                    id="first-name"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Enter your first name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="last-name">Last Name</Label>
+                  <Input
+                    id="last-name"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Enter your last name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Enter your phone number"
+                  />
+                </div>
                 <div>
                   <Label htmlFor="signup-email">Email</Label>
                   <Input
@@ -223,7 +297,11 @@ const Auth = () => {
                     className="absolute right-0 top-6 px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
                 <div>
@@ -237,7 +315,9 @@ const Auth = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : (
+                  {isLoading ? (
+                    "Creating account..."
+                  ) : (
                     <>
                       <UserPlus className="w-4 h-4 mr-2" />
                       Sign Up

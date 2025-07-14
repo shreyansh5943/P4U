@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -14,22 +13,38 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <img src={logoImage} alt="Prompt4U" className="h-8 w-8" />
+            <img
+              src={logoImage}
+              alt="Prompt4U"
+              className="h-8 w-8 rounded-full"
+            />
             <span className="text-xl font-bold text-gray-900">Prompt4U</span>
           </Link>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/prompt-builder" className="text-gray-700 hover:text-primary transition-colors">
+            <Link
+              to="/prompt-builder"
+              className="text-gray-700 hover:text-primary transition-colors"
+            >
               Prompt Builder
             </Link>
-            <Link to="/templates" className="text-gray-700 hover:text-primary transition-colors">
+            <Link
+              to="/templates"
+              className="text-gray-700 hover:text-primary transition-colors"
+            >
               Templates
             </Link>
-            <Link to="/examples" className="text-gray-700 hover:text-primary transition-colors">
+            <Link
+              to="/examples"
+              className="text-gray-700 hover:text-primary transition-colors"
+            >
               Examples
             </Link>
-            <Link to="/about" className="text-gray-700 hover:text-primary transition-colors">
+            <Link
+              to="/about"
+              className="text-gray-700 hover:text-primary transition-colors"
+            >
               About
             </Link>
             <UserAccountButton />
@@ -42,7 +57,11 @@ const Navigation = () => {
               size="sm"
               onClick={() => setIsOpen(!isOpen)}
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </Button>
           </div>
         </div>

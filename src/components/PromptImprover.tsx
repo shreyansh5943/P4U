@@ -1,9 +1,14 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Sparkles, Copy, RefreshCw, Replace } from "lucide-react";
 
@@ -14,23 +19,29 @@ interface PromptImproverProps {
 
 type ImprovementType = "clarity" | "seo" | "technical";
 
-const PromptImprover = ({ originalPrompt, onReplaceOriginal }: PromptImproverProps) => {
-  const [improvementType, setImprovementType] = useState<ImprovementType>("clarity");
+const PromptImprover = ({
+  originalPrompt,
+  onReplaceOriginal,
+}: PromptImproverProps) => {
+  const [improvementType, setImprovementType] =
+    useState<ImprovementType>("clarity");
   const [improvedPrompt, setImprovedPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const improvementOptions = {
     clarity: "Improve for clarity & tone",
-    seo: "Improve for SEO-friendly output", 
-    technical: "Improve for technical precision"
+    seo: "Improve for SEO-friendly output",
+    technical: "Improve for technical precision",
   };
 
   const getImprovementInstruction = (type: ImprovementType) => {
     const instructions = {
-      clarity: "Improve the following AI prompt for building a website. Focus on making it clearer, more polished, and better structured while keeping all the original features and requirements. Make the language more professional and easier to understand.",
+      clarity:
+        "Improve the following AI prompt for building a website. Focus on making it clearer, more polished, and better structured while keeping all the original features and requirements. Make the language more professional and easier to understand.",
       seo: "Improve the following AI prompt for building a website. Focus on making it more SEO-friendly by adding relevant keywords, meta descriptions, and search optimization requirements while keeping all the original features intact.",
-      technical: "Improve the following AI prompt for building a website. Focus on adding more technical precision, specific requirements, best practices, and detailed implementation guidelines while preserving all the original features and intent."
+      technical:
+        "Improve the following AI prompt for building a website. Focus on adding more technical precision, specific requirements, best practices, and detailed implementation guidelines while preserving all the original features and intent.",
     };
     return instructions[type];
   };
@@ -39,42 +50,66 @@ const PromptImprover = ({ originalPrompt, onReplaceOriginal }: PromptImproverPro
     if (!originalPrompt.trim()) {
       toast({
         title: "No prompt to improve",
-        description: "Please generate a prompt first before trying to improve it.",
-        variant: "destructive"
+        description:
+          "Please generate a prompt first before trying to improve it.",
+        variant: "destructive",
       });
       return;
     }
 
+    // Deduct AI credit
+    // You may need to import useAuth and supabase if not already
+    // @ts-ignore
+    const user = window.__PROMPT4U_USER__?.user; // Replace with your actual user context
+    if (user) {
+      // @ts-ignore
+      const { data: canUse, error: usageError } = await supabase.rpc(
+        "increment_ai_usage",
+        {
+          user_uuid: user.id,
+        }
+      );
+      if (usageError || !canUse) {
+        toast({
+          title: "Daily Limit Reached",
+          description:
+            "You've reached your daily limit of 5 AI uses. Try again tomorrow!",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsLoading(true);
     try {
-      const response = await fetch('/api/improve-prompt', {
-        method: 'POST',
+      const response = await fetch("/api/improve-prompt", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           prompt: originalPrompt,
-          improvementType: getImprovementInstruction(improvementType)
+          improvementType: getImprovementInstruction(improvementType),
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to improve prompt');
+        throw new Error("Failed to improve prompt");
       }
 
       const data = await response.json();
       setImprovedPrompt(data.improvedPrompt);
-      
+
       toast({
         title: "Prompt Improved! ✨",
         description: "Your prompt has been enhanced with AI.",
       });
     } catch (error) {
-      console.error('Error improving prompt:', error);
+      console.error("Error improving prompt:", error);
       toast({
         title: "Error",
         description: "Failed to improve prompt. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -93,7 +128,8 @@ const PromptImprover = ({ originalPrompt, onReplaceOriginal }: PromptImproverPro
     onReplaceOriginal(improvedPrompt);
     toast({
       title: "Prompt Replaced!",
-      description: "Original prompt has been replaced with the improved version.",
+      description:
+        "Original prompt has been replaced with the improved version.",
     });
   };
 
@@ -114,7 +150,12 @@ const PromptImprover = ({ originalPrompt, onReplaceOriginal }: PromptImproverPro
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <div className="flex-1">
-            <Select value={improvementType} onValueChange={(value: ImprovementType) => setImprovementType(value)}>
+            <Select
+              value={improvementType}
+              onValueChange={(value: ImprovementType) =>
+                setImprovementType(value)
+              }
+            >
               <SelectTrigger className="bg-white">
                 <SelectValue />
               </SelectTrigger>
@@ -159,7 +200,7 @@ const PromptImprover = ({ originalPrompt, onReplaceOriginal }: PromptImproverPro
                 className="bg-white border-2 border-purple-200 min-h-[200px] font-mono text-sm leading-relaxed resize-none"
               />
             </div>
-            
+
             <div className="flex flex-wrap gap-3">
               <Button
                 onClick={copyImprovedPrompt}

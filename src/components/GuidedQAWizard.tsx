@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +21,7 @@ const GuidedQAWizard = ({ onPromptGenerated }: GuidedQAWizardProps) => {
     targetAudience: "",
     desiredAction: "",
     brandPersonality: "",
-    additionalInfo: ""
+    additionalInfo: "",
   });
   const { toast } = useToast();
   const { user } = useAuth();
@@ -34,40 +33,44 @@ const GuidedQAWizard = ({ onPromptGenerated }: GuidedQAWizardProps) => {
       id: "whatYouSell",
       title: "What do you sell or offer?",
       placeholder: "e.g., Handmade soaps, Web design services, Online courses",
-      type: "input"
+      type: "input",
     },
     {
       id: "targetAudience",
       title: "Who is your ideal customer?",
-      placeholder: "e.g., Eco-conscious millennials, Small business owners, College students",
-      type: "input"
+      placeholder:
+        "e.g., Eco-conscious millennials, Small business owners, College students",
+      type: "input",
     },
     {
       id: "desiredAction",
       title: "What do you want visitors to do on your website?",
-      placeholder: "e.g., Buy products, Contact me for services, Sign up for newsletter",
-      type: "input"
+      placeholder:
+        "e.g., Buy products, Contact me for services, Sign up for newsletter",
+      type: "input",
     },
     {
       id: "brandPersonality",
       title: "How would you describe your brand personality?",
-      placeholder: "e.g., Fun and playful, Professional and trustworthy, Creative and artistic",
-      type: "input"
+      placeholder:
+        "e.g., Fun and playful, Professional and trustworthy, Creative and artistic",
+      type: "input",
     },
     {
       id: "additionalInfo",
       title: "Any specific requirements or features you need?",
-      placeholder: "e.g., Online booking, Image gallery, Blog section, customer reviews",
-      type: "textarea"
-    }
+      placeholder:
+        "e.g., Online booking, Image gallery, Blog section, customer reviews",
+      type: "textarea",
+    },
   ];
 
   const currentQuestion = questions[currentStep - 1];
 
   const handleAnswerChange = (value: string) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [currentQuestion.id]: value
+      [currentQuestion.id]: value,
     }));
   };
 
@@ -88,7 +91,24 @@ const GuidedQAWizard = ({ onPromptGenerated }: GuidedQAWizardProps) => {
       toast({
         title: "Authentication Required",
         description: "Please sign in to use AI features.",
-        variant: "destructive"
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Deduct AI credit
+    const { data: canUse, error: usageError } = await supabase.rpc(
+      "increment_ai_usage",
+      {
+        user_uuid: user.id,
+      }
+    );
+    if (usageError || !canUse) {
+      toast({
+        title: "Daily Limit Reached",
+        description:
+          "You've reached your daily limit of 5 AI uses. Try again tomorrow!",
+        variant: "destructive",
       });
       return;
     }
@@ -103,34 +123,39 @@ Brand personality: ${answers.brandPersonality}
 Additional requirements: ${answers.additionalInfo}
       `;
 
-      const { data, error } = await supabase.functions.invoke('analyze-business-idea', {
-        body: { 
-          businessIdea: qaData,
-          analysisType: 'guided-qa'
+      const { data, error } = await supabase.functions.invoke(
+        "analyze-business-idea",
+        {
+          body: {
+            businessIdea: qaData,
+            analysisType: "guided-qa",
+          },
         }
-      });
+      );
 
       if (error) throw error;
 
       onPromptGenerated(data.result);
-      
+
       toast({
         title: "Prompt Generated!",
-        description: "Your personalized prompt has been created based on your answers.",
+        description:
+          "Your personalized prompt has been created based on your answers.",
       });
     } catch (error) {
-      console.error('Error generating prompt:', error);
+      console.error("Error generating prompt:", error);
       toast({
         title: "Generation Failed",
         description: "Unable to generate your prompt. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const canProceed = answers[currentQuestion.id as keyof typeof answers]?.trim();
+  const canProceed =
+    answers[currentQuestion.id as keyof typeof answers]?.trim();
 
   return (
     <Card className="mb-8">
@@ -148,7 +173,7 @@ Additional requirements: ${answers.additionalInfo}
           </div>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
+          <div
             className="bg-gradient-to-r from-purple-500 to-pink-600 h-2 rounded-full transition-all duration-500"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
           ></div>
@@ -186,7 +211,7 @@ Additional requirements: ${answers.additionalInfo}
             <ArrowLeft className="w-4 h-4" />
             Previous
           </Button>
-          
+
           {currentStep === totalSteps ? (
             <Button
               onClick={generatePrompt}
