@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Prompt4U
 
 ## How can I edit this code?
@@ -55,3 +56,7 @@ You can deploy this project using your preferred hosting service (e.g., Vercel, 
 Yes, you can!
 
 Most hosting providers allow you to connect a custom domain. Refer to your host's documentation for details.
+=======
+# P4U
+SaaS 1
+>>>>>>> a14a362f3703aedf149882597b2a1fc3e1d52dad
